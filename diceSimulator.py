@@ -5,3 +5,12 @@
 # HINT: set min and max number your dice can produce
 # HINT: want a function that randomly grabs a number from that range and prints it
 import random
+
+print('Hello, let me roll the dice for you!')
+
+def rollDice():
+    randomNumber = random.randint(1, 6)
+    return randomNumber
+
+diceRoll = rollDice()
+print('The dice rolled ' + str(diceRoll))
