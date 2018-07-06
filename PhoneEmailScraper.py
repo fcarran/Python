@@ -13,7 +13,7 @@ phoneRegex = re.compile(r'''
 (((ext(\.)?\s)|x) #extension number-part (optional)
 (\d{2, 5}))? #extension number pat
 )
-''', re.VERBOSE)
+''', re.VERBOSE) #VERBOSE allows for cleaner line spacing in a regex obj, using whitespace
 
 # Create a regex object for emails addresses
 emailRegex = re.compile(r'''
