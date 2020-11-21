@@ -9,7 +9,34 @@ import sqlite3
 
 DATABASE_LOCATION = "sqlite:///my_played_tracks.sqlite" # set constants as capitals
 USER_ID = "fcarran1" # Spotify username
-TOKEN = "BQBc1uTHT8j2eoCSDHiYFYf6VmbKROa5aap38JtILauUl0JJ3nN2J6oEuC693bW8gzTyD55_PgswwgQXcZ637nMLVXJkogFVeSpuOhtv6LtUi5HRVTdGxfCxdtAKt324TFpUQvXoi4WqY5VFow" # Spotify API Token
+TOKEN = "BQCvlz1u4ylAbiXB3-jwO3drqgP9pLDqPb_EbMJvk_vE6_1ywzK6fIU9SLf_BUQ-VGHQG3I-SgyfV1hqiop_lF5oEyY7cY0_BA7PGes3e3v7r56hlNy9O079qQnsWdsdHDenkn48xnwVJtRahA" # Spotify API Token
+
+def check_if_valid_data(df: pd.DataFrame) -> bool:
+    # Check if dataframe is empty
+    if df.empty:
+        print("No songs downloaded. Finishing execution")
+        return False 
+
+    # Primary Key Check
+    if pd.Series(df['played_at']).is_unique:
+        pass
+    else:
+        raise Exception("Primary Key check is violated")
+
+    # Check for nulls
+    if df.isnull().values.any():
+        raise Exception("Null values found")
+
+    # Check that all timestamps are of yesterday's date
+    yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+    yesterday = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    timestamps = df["timestamp"].tolist()
+    for timestamp in timestamps:
+        if datetime.datetime.strptime(timestamp, '%Y-%m-%d') != yesterday:
+            raise Exception("At least one of the returned songs does not have a yesterday's timestamp")
+
+    return True
 
 if __name__ == "__main__":
 
@@ -30,6 +57,8 @@ if __name__ == "__main__":
     r = requests.get("https://api.spotify.com/v1/me/player/recently-played?after={time}".format(time=yesterday_unix_timestamp), headers = headers)
 
     data = r.json()
+
+    #print(data)
 
     song_names = []
     artist_names = []
@@ -54,4 +83,12 @@ if __name__ == "__main__":
     song_df = pd.DataFrame(song_dict, columns = ["song_name", "artist_name", "played_at", "timestamp"])
 
 
-print(song_df)
+    
+
+    # validation of data
+
+    if check_if_valid_data(song_df):
+        print("Data valid, proceed to Load stage")
+
+
+    print(song_df)
